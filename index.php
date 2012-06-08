@@ -9,6 +9,10 @@
  * @copyright 2012 Benjamin J. Balter
  */
 
+//WordPress (path to WordPress install's wp-load file)
+//The only configuration you really need to worry about
+$path_to_wordpress = '../3.3.2/wp-load.php';
+
 //no file uploaded, present form
 if ( empty( $_FILES ) ) {
 	include 'form.php';
@@ -17,8 +21,13 @@ if ( empty( $_FILES ) ) {
 
 //bootstrap a few things we're gonna need...
 include 'tags.php'; //custom KSES file
-include '../3.3.2/wp-load.php'; //WordPress (path to WordPress install's wp-load file)
 include 'functions.php'; //grab custom footnote parsing function
+
+//verify we have WordPress to bootstrap
+if ( !file_exists( $path_to_wordpress ) )
+	die( 'Please specify a pass to your local WordPress install\'s wp-load.php file at the top of index.php' );
+	
+include $path_to_wordpress; 
 
 //attempt to read temporary file into a string
 $html = @file_get_contents( $_FILES['file']['tmp_name'] );
@@ -26,6 +35,8 @@ $html = @file_get_contents( $_FILES['file']['tmp_name'] );
 //if something doesn't look right, no need to go any further
 if ( $_FILES['file']['error'] || $_FILES['file']['type'] != 'text/html' || !$html )
 	die( 'Invalid Upload' );
+
+$bootstrap = isset( $_POST['bootstrap'] );
 
 //Use WordPress's native filter API since we're already bootstrapped... 
 //You can add or remove any filters you want here
@@ -47,5 +58,13 @@ add_filter( 'convert_word', 'bb_i_to_em'                );
 //convert file and output straight back to browser as download
 header('Content-type: text/html');
 header('Content-Disposition: attachment; filename="' . $_FILES['file']['name'] . '"');
+
+if ( $bootstrap )
+	echo file_get_contents( 'templates/header.html' );
+	
 echo apply_filters( 'convert_word', $html );
+
+if ( $bootstrap )
+	echo file_get_contents( 'templates/footer.html' );
+
 exit();

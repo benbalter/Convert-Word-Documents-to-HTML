@@ -75,10 +75,6 @@ $allowedposttags = array(
 			'open' => true,
 			'xml:lang' => true,
 		),
-		'div' => array(
-			'lang' => true,
-			'xml:lang' => true,
-		),
 		'dl' => array(),
 		'dt' => array(),
 		'em' => array(),
@@ -212,7 +208,6 @@ $allowedposttags = array(
 			'char' => true,
 			'charoff' => true,
 		),
-		'title' => array(),
 		'tr' => array(
 			'char' => true,
 			'charoff' => true,
