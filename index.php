@@ -72,6 +72,7 @@ add_filter( 'convert_word', 'bb_normalize_line_endings' ); //Word gives us Windo
 add_filter( 'convert_word', 'bb_remove_hard_word_wrap'  ); //remove hard word wrap best we can
 add_filter( 'convert_word', 'bb_b_to_strong'            ); //what is this, 1999? Who uses <b> and <i> still?
 add_filter( 'convert_word', 'bb_i_to_em'                );
+add_filter( 'convert_word', 'bb_convert_toc'            );
 
 //convert file and output straight back to browser as download
 header('Content-type: text/html');

@@ -129,3 +129,52 @@ function bb_remove_extra_spaces( $content ) {
 	return $content;
 	
 }
+
+/**
+ * Converts table of contents to navbar
+ * @todo make this work better
+ * @todo heirarchical support
+ */
+function bb_convert_toc( $content ) {
+	
+	//parse TOC
+	$find = array(); $replace = array();
+	preg_match_all( '#<p><a>([A-Z]{1,3})\. ([^<]+)?\. [0-9]+</a></p>#', $content, $matches );
+	foreach ( $matches[2] as $ID => $match ) {
+		$find[] = '#<h[0-9]>' . $matches[1][$ID] . '.&nbsp; ' . $match . '</h[0-9]>#'; 
+		$replace[] = '<h2 id="' . sanitize_title( $match ) . '">' . $matches[1][$ID] . '. ' . $match . '</h2>';
+	}
+
+	//clean bad toc links
+	$content = preg_replace( '#<a name="_Toc[0-9]+">([^<]*)?</a>#', '$1', $content );
+	$content = preg_replace( '#<p><a>([A-Z]{1,3})\. ([^<]+)?\. [0-9]+</a></p>#', '', $content );
+	
+	//swap our headings
+	$content = preg_replace( $find, $replace, $content );
+	
+	//build TOC
+	ob_start(); ?>
+</div><!-- end container opened in header -->
+<div class="navbar navbar-fixed-top" id="navbar">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+			<a class="brand" href="#top">TITLE</a>
+			<div class="nav-collapse">
+				<ul class="nav">
+					<?php foreach ( $matches[2] as $match ) { ?>
+					<li><a href="#<?php echo sanitize_title( $match ); ?>"><?php echo $match; ?></a></li>
+					<?php } ?>
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+	</div>
+</div>
+<div class="container">
+<?php
+	return ob_get_clean() . $content;
+}
